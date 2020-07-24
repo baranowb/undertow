@@ -25,6 +25,10 @@ import io.undertow.attribute.RequestLineAttribute;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.servlet.handlers.ServletRequestContext;
 
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import javax.servlet.RequestDispatcher;
 
 /**
@@ -59,7 +63,20 @@ public class ServletRequestLineAttribute implements ExchangeAttribute {
             sb.append(query);
         } else if (!exchange.getQueryString().isEmpty()) {
             sb.append('?');
-            sb.append(exchange.getQueryString());
+            final Iterator<Entry<String, Deque<String>>> queryEntrySet = exchange.getQueryParameters().entrySet().iterator();
+            while(queryEntrySet.hasNext()) {
+                final Entry<String, Deque<String>> entry = queryEntrySet.next();
+                final String paramName = entry.getKey();
+                final Iterator<String> values= entry.getValue().iterator();
+                while(values.hasNext()) {
+                    sb.append(paramName).append("=").append(values.next());
+                    if(values.hasNext())
+                        sb.append("&");
+                }
+                if(queryEntrySet.hasNext()) {
+                    sb.append("&");
+                }
+            }
         }
         sb.append(' ')
                 .append(exchange.getProtocol().toString()).toString();

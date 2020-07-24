@@ -39,7 +39,11 @@ public class RequestURLAttribute implements ExchangeAttribute {
 
     @Override
     public String readAttribute(final HttpServerExchange exchange) {
-        return exchange.getRequestURI();
+        if(exchange.getRequestPath().equals("/")) {
+            return exchange.getRequestURI();
+        } else {
+            return exchange.getRequestPath();
+        }
     }
 
     @Override
