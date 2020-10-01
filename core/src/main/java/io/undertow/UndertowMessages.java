@@ -610,4 +610,7 @@ public interface UndertowMessages {
 
     @Message(id = 196, value = "Session with id %s already exists")
     IllegalStateException sessionWithIdAlreadyExists(String sessionID);
+
+    @Message(id = 197, value = "Failed to schedule access message. Access logger is closing.")
+    IllegalStateException failedToLogAccessOnClose();
 }

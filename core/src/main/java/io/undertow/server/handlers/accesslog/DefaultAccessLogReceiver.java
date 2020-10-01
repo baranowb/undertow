@@ -38,6 +38,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 import io.undertow.UndertowLogger;
+import io.undertow.UndertowMessages;
 
 /**
  * Log Receiver that stores logs in a directory under the specified file name, and rotates them after
@@ -139,6 +140,11 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
 
     @Override
     public void logMessage(final String message) {
+        if(closed) {
+            //Log handler is closing, other resources should as well, there shouldn't 
+            //be resources served that required this to log stuff into AL file.
+            throw UndertowMessages.MESSAGES.failedToLogAccessOnClose();
+        }
         this.pendingMessages.add(message);
         int state = stateUpdater.get(this);
         if (state == 0) {
