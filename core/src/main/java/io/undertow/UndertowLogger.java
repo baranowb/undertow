@@ -439,4 +439,21 @@ public interface UndertowLogger extends BasicLogger {
     @LogMessage(level = DEBUG)
     @Message(id = 5095, value = "SSLEngine delegated task was rejected")
     void sslEngineDelegatedTaskRejected(@Cause RejectedExecutionException ree);
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5096, value = "Access Log Worker failed to transition gracefuly.")
+    void accessLogWorkerFailureOnTransition();
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5097, value = "Access Log Worker failed to reschedule.")
+    void accessLogWorkerFailureOnReschedule();
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5098, value = "Access Log Worker did not terminate cleanly.")
+    void accessLogWorkerNoTermination();
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5099, value = "Interruption in close()")
+    void closeInterrupted(@Cause InterruptedException ie);
+
 }
