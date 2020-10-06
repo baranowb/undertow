@@ -675,4 +675,7 @@ public interface UndertowMessages {
 
     @Message(id = 217, value = "The 'defaultTargetFactory' must be set before calling 'build'")
     IllegalStateException defaultTargetFactoryMustBeSetBeforeBuild();
+
+    @Message(id = 218, value = "Failed to schedule access message. Access logger is closing.")
+    IllegalStateException failedToLogAccessOnClose();
 }
