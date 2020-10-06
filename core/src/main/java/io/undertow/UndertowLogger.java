@@ -434,4 +434,12 @@ public interface UndertowLogger extends BasicLogger {
     @LogMessage(level = DEBUG)
     @Message(id = 5094, value = "Blocking write timed out")
     void blockingWriteTimedOut(@Cause WriteTimeoutException rte);
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5095, value = "Access Log Worker failed to transition gracefuly.")
+    void accessLogWorkerFailureOnTransition();
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5096, value = "Access Log Worker failed to reschedule.")
+    void accessLogWorkerFailureOnReschedule();
 }
