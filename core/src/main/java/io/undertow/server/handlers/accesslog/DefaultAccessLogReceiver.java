@@ -58,7 +58,7 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
     //0 = not running
     //1 = queued
     //2 = running
-    //3 = closing
+    //3 = closing/closed
     @SuppressWarnings("unused")
     private volatile int state = 0;
 
@@ -80,6 +80,8 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
     private boolean initialRun = true;
     private final boolean rotate;
     private final LogFileHeaderGenerator fileHeaderGenerator;
+    private final int closeRetryCount;
+    private final int closeRetryDelay;
 
     public DefaultAccessLogReceiver(final Executor logWriteExecutor, final File outputDirectory, final String logBaseName) {
         this(logWriteExecutor, outputDirectory.toPath(), logBaseName, null);
@@ -102,10 +104,10 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
     }
 
     public DefaultAccessLogReceiver(final Executor logWriteExecutor, final Path outputDirectory, final String logBaseName, final String logNameSuffix, boolean rotate) {
-        this(logWriteExecutor, outputDirectory, logBaseName, logNameSuffix, rotate, null);
+        this(logWriteExecutor, outputDirectory, logBaseName, logNameSuffix, rotate, null, 60, 50);
     }
 
-    private DefaultAccessLogReceiver(final Executor logWriteExecutor, final Path outputDirectory, final String logBaseName, final String logNameSuffix, boolean rotate, LogFileHeaderGenerator fileHeader) {
+    private DefaultAccessLogReceiver(final Executor logWriteExecutor, final Path outputDirectory, final String logBaseName, final String logNameSuffix, boolean rotate, LogFileHeaderGenerator fileHeader, final int closeRetryCount, final int closeRetryDelay) {
         this.logWriteExecutor = logWriteExecutor;
         this.outputDirectory = outputDirectory;
         this.logBaseName = logBaseName;
@@ -114,6 +116,8 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         this.logNameSuffix = (logNameSuffix != null) ? logNameSuffix : DEFAULT_LOG_SUFFIX;
         this.pendingMessages = new ConcurrentLinkedDeque<>();
         this.defaultLogFile = outputDirectory.resolve(logBaseName + this.logNameSuffix);
+        this.closeRetryCount = closeRetryCount;
+        this.closeRetryDelay = closeRetryDelay;
         calculateChangeOverPoint();
     }
 
@@ -355,10 +359,10 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
                 return;
             }
             // either failed race to 1->3 or we were in 2. We have to wait here sometime.
-            // wait ~1s, if situation does not clear up, try dumping stuff
-            for(int i=0; i<20;i++) {
+            // wait ~3s(by default), if situation does not clear up, try dumping stuff
+            for(int i=0; i<this.closeRetryCount;i++) {
                 try {
-                    Thread.currentThread().sleep(50);
+                    Thread.currentThread().sleep(this.closeRetryDelay);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -367,7 +371,10 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
                     break;
                 }
             }
-            this.stateUpdater.set(this, 3);
+            final int tempEndState = this.stateUpdater.getAndSet(this, 3);
+            if(tempEndState == 2) {
+                UndertowLogger.ROOT_LOGGER.accessLogWorkerNoTermination();
+            }
             flushAndTerminate();
         }
     }
@@ -406,6 +413,8 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         private String logNameSuffix;
         private boolean rotate;
         private LogFileHeaderGenerator logFileHeaderGenerator;
+        private int closeRetryCount = 60;
+        private int closeRetryDelay = 50;
 
         public Executor getLogWriteExecutor() {
             return logWriteExecutor;
@@ -461,8 +470,30 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
             return this;
         }
 
+        public int getCloseRetryCount() {
+            return closeRetryCount;
+        }
+
+        public Builder setCloseRetryCount(int closeRetryCount) {
+            this.closeRetryCount = closeRetryCount;
+            return this;
+        }
+
+        public int getCloseRetryDelay() {
+            return closeRetryDelay;
+        }
+
+        /**
+         * Delay in ms between retrying poll on state to check for proper termination of worker
+         * @param closeRetryDelay
+         */
+        public Builder setCloseRetryDelay(int closeRetryDelay) {
+            this.closeRetryDelay = closeRetryDelay;
+            return this;
+        }
+
         public DefaultAccessLogReceiver build() {
-            return new DefaultAccessLogReceiver(logWriteExecutor, outputDirectory, logBaseName, logNameSuffix, rotate, logFileHeaderGenerator);
+            return new DefaultAccessLogReceiver(logWriteExecutor, outputDirectory, logBaseName, logNameSuffix, rotate, logFileHeaderGenerator, closeRetryCount, closeRetryDelay);
         }
     }
 }
