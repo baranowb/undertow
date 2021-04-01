@@ -155,7 +155,7 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         final ServletRequestContext servletRequestContext = new ServletRequestContext(servletContext.getDeployment(), request, response, info);
         //set the max request size if applicable
         if (info.getServletChain().getManagedServlet().getMaxRequestSize() > 0) {
-            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
+            exchange.setMaxMultiPartEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
         }
         exchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
 
@@ -225,7 +225,7 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         servletRequestContext.setServletResponse(response);
         //set the max request size if applicable
         if (info.getServletChain().getManagedServlet().getMaxRequestSize() > 0) {
-            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
+            exchange.setMaxMultiPartEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
         }
         exchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
 

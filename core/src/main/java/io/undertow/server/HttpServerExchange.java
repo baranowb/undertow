@@ -40,6 +40,7 @@ import io.undertow.util.AttachmentKey;
 import io.undertow.util.ConduitFactory;
 import io.undertow.util.Cookies;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
@@ -237,6 +238,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     private long maxEntitySize;
 
+    private long maxMultiPartEntitySize=-1;
     /**
      * When the call stack return this task will be executed by the executor specified in {@link #dispatchExecutor}.
      * If the executor is null then it will be executed by the XNIO worker.
@@ -1875,7 +1877,11 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @return The maximum entity size for this exchange
      */
     public long getMaxEntitySize() {
-        return maxEntitySize;
+        if(this.isMultiPartExchange()) {
+            return this.maxMultiPartEntitySize;
+        } else {
+            return maxEntitySize;
+        }
     }
 
     /**
@@ -1888,8 +1894,41 @@ public final class HttpServerExchange extends AbstractAttachable {
             throw UndertowMessages.MESSAGES.requestChannelAlreadyProvided();
         }
         this.maxEntitySize = maxEntitySize;
-        connection.maxEntitySizeUpdated(this);
+        if(!isMultiPartExchange()) {
+            //NOTE: without it, it will default to io.undertow.UndertowOptions#MAX_ENTITY_SIZE, so its only set
+            //for multipart
+            connection.maxEntitySizeUpdated(this);
+        }
         return this;
+    }
+
+    /**
+     * Sets the max multiplart entity size for this exchange. This cannot be modified after the request channel has been obtained.
+     * This value will be used only if exchange is multipart.
+     *
+     * @param maxEntitySize The max entity size
+     */
+    public HttpServerExchange setMaxMultiPartEntitySize(final long maxMultiPartEntitySize) {
+        if (!isRequestChannelAvailable()) {
+            throw UndertowMessages.MESSAGES.requestChannelAlreadyProvided();
+        }
+
+        this.maxMultiPartEntitySize = maxMultiPartEntitySize;
+        if(isMultiPartExchange()) {
+            //NOTE: without it, it will default to io.undertow.UndertowOptions#MAX_ENTITY_SIZE, so its only set
+            //for multipart
+            connection.maxEntitySizeUpdated(this);
+        }
+        return this;
+    }
+    private boolean isMultiPartExchange() {
+        //NOTE: should this include Range response?
+        final HeaderValues contentTypeHeaders = getRequestHeaders().get("Content-Type");
+        if(contentTypeHeaders != null && contentTypeHeaders.size() >0) {
+            return contentTypeHeaders.getFirst().startsWith("multipart");
+        } else {
+            return false;
+        }
     }
 
     public SecurityContext getSecurityContext() {
