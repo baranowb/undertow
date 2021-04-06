@@ -154,8 +154,8 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         final HttpServletRequestImpl request = new HttpServletRequestImpl(exchange, servletContext);
         final ServletRequestContext servletRequestContext = new ServletRequestContext(servletContext.getDeployment(), request, response, info);
         //set the max request size if applicable
-        if (info.getServletChain().getManagedServlet().getMaxRequestSize() > 0) {
-            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
+        if (info.getServletChain().getManagedServlet().getMaxMultipartRequestSize() > 0 && exchange.isMultiPartExchange()) {
+            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxMultipartRequestSize());
         }
         exchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
 
@@ -224,8 +224,8 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         servletRequestContext.setServletRequest(request);
         servletRequestContext.setServletResponse(response);
         //set the max request size if applicable
-        if (info.getServletChain().getManagedServlet().getMaxRequestSize() > 0) {
-            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
+        if (info.getServletChain().getManagedServlet().getMaxMultipartRequestSize() > 0 && exchange.isMultiPartExchange()) {
+            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxMultipartRequestSize());
         }
         exchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
 
