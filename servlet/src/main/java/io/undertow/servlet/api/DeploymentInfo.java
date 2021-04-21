@@ -84,6 +84,7 @@ public class DeploymentInfo implements Cloneable {
     private ConfidentialPortManager confidentialPortManager;
     private boolean allowNonStandardWrappers = false;
     private int defaultSessionTimeout = 60 * 30;
+    private long defaultAsyncContextTimeout = 30000;
     private ConcurrentMap<String, Object> servletContextAttributeBackingMap;
     private ServletSessionConfig servletSessionConfig;
     private String hostName = "localhost";
@@ -313,6 +314,18 @@ public class DeploymentInfo implements Cloneable {
      */
     public DeploymentInfo setDefaultSessionTimeout(final int defaultSessionTimeout) {
         this.defaultSessionTimeout = defaultSessionTimeout;
+        return this;
+    }
+
+    public long getDefaultAsyncConextTimeout() {
+        return defaultAsyncContextTimeout;
+    }
+
+    /**
+     * @param defaultAsyncContextTimeout The default async context timeout, in milliseconds
+     */
+    public DeploymentInfo setDefaultAsyncConextTimeout(final long defaultAsyncContextTimeout) {
+        this.defaultAsyncContextTimeout = defaultAsyncContextTimeout;
         return this;
     }
 
@@ -1457,6 +1470,7 @@ public class DeploymentInfo implements Cloneable {
         info.notificationReceivers.addAll(notificationReceivers);
         info.allowNonStandardWrappers = allowNonStandardWrappers;
         info.defaultSessionTimeout = defaultSessionTimeout;
+        info.defaultAsyncContextTimeout = defaultAsyncContextTimeout;
         info.servletContextAttributeBackingMap = servletContextAttributeBackingMap;
         info.servletSessionConfig = servletSessionConfig;
         info.hostName = hostName;
