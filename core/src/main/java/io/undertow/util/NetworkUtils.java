@@ -20,9 +20,9 @@ package io.undertow.util;
 
 import io.undertow.UndertowMessages;
 
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * @author Stuart Douglas
@@ -43,7 +43,7 @@ public class NetworkUtils {
     }
 
 
-    public static InetAddress parseIpv4Address(String addressString) throws IOException {
+    public static InetAddress parseIpv4Address(String addressString) throws IllegalArgumentException, UnknownHostException {
         String[] parts = addressString.split("\\.");
         if (parts.length != 4) {
             throw UndertowMessages.MESSAGES.invalidIpAddress(addressString);
@@ -58,10 +58,9 @@ public class NetworkUtils {
             data[i] = (byte) Integer.parseInt(part);
         }
         return InetAddress.getByAddress(data);
-
     }
 
-    public static InetAddress parseIpv6Address(String addressString) throws IOException {
+    public static InetAddress parseIpv6Address(String addressString) throws IllegalArgumentException, UnknownHostException {
         boolean startsWithColon = addressString.startsWith(":");
         if (startsWithColon && !addressString.startsWith("::")) {
             throw UndertowMessages.MESSAGES.invalidIpAddress(addressString);

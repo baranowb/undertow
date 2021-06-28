@@ -578,7 +578,7 @@ public interface UndertowMessages {
     IOException streamLimitExceeded();
 
     @Message(id = 185, value = "Invalid IP address %s")
-    IOException invalidIpAddress(String addressString);
+    IllegalArgumentException invalidIpAddress(String addressString);
 
     @Message(id = 186, value = "Invalid TLS extension")
     SSLException invalidTlsExt();
@@ -618,4 +618,5 @@ public interface UndertowMessages {
 
     @Message(id = 198, value = "Blocking write timed out after %s nanoseconds.")
     WriteTimeoutException blockingWriteTimedOut(long timeoutNanoseconds);
+
 }
