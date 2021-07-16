@@ -618,4 +618,7 @@ public interface UndertowMessages {
 
     @Message(id = 198, value = "Blocking write timed out after %s nanoseconds.")
     WriteTimeoutException blockingWriteTimedOut(long timeoutNanoseconds);
+
+    @Message(id = 199, value = "Failed to initialize path manager for '%s' path.")
+    RuntimeException failedToInitializePathManager(String path, @Cause IOException ioe);
 }
