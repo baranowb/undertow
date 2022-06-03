@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -65,7 +64,7 @@ import io.undertow.util.WorkerUtils;
 public class SimpleNonceManager implements SessionNonceManager {
 
     private static final String DEFAULT_HASH_ALG = "MD5";
-
+    private static final SecureRandom NONCE_RANDOM = new SecureRandom();
     /**
      * List of invalid nonces, this list contains the nonces that have been used without a nonce count.
      *
@@ -128,9 +127,8 @@ public class SimpleNonceManager implements SessionNonceManager {
         this.hashLength = digest.getDigestLength();
 
         // Create a new secret only valid within this NonceManager instance.
-        Random rand = new SecureRandom();
         byte[] secretBytes = new byte[32];
-        rand.nextBytes(secretBytes);
+        NONCE_RANDOM.nextBytes(secretBytes);
         secret = FlexBase64.encodeString(digest.digest(secretBytes), false);
     }
 

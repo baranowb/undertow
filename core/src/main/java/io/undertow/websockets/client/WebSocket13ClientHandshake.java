@@ -56,6 +56,7 @@ import java.util.Set;
 public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
 
     public static final String MAGIC_NUMBER = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+    private static final SecureRandom HANDSHAKE_RANDOM = new SecureRandom();
 
     private final WebSocketClientNegotiation negotiation;
     private final Set<ExtensionHandshake> extensions;
@@ -142,10 +143,9 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
     }
 
     protected String createSecKey() {
-        SecureRandom random = new SecureRandom();
         byte[] data = new byte[16];
         for (int i = 0; i < 4; ++i) {
-            int val = random.nextInt();
+            int val = HANDSHAKE_RANDOM.nextInt();
             data[i * 4] = (byte) val;
             data[i * 4 + 1] = (byte) ((val >> 8) & 0xFF);
             data[i * 4 + 2] = (byte) ((val >> 16) & 0xFF);

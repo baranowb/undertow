@@ -212,12 +212,12 @@
         <Class name="~io\.undertow\.protocols\.ajp\.AjpClientChannel\$.*"/>
     </Match>
 
-    <!-- Is done actually only once, no harm in it -->
+    <!-- Is done actually only once, no harm in it TODO: remove it
     <Match>
         <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
         <Class name="io.undertow.util.HttpString"/>
     </Match>
-
+-->
     <Match>
         <Bug pattern="EQ_COMPARETO_USE_OBJECT_EQUALS"/>
         <Or>
@@ -307,5 +307,209 @@
     <Match>
         <Bug pattern="IS2_INCONSISTENT_SYNC"/>
         <Class name="io.undertow.protocols.ssl.SslConduit"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"/>
+        <Class name="io.undertow.annotationprocessor.HttpParserAnnotationProcessor"/>
+        <Method name="process"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"/>
+        <Class name="io.undertow.Undertow"/>
+        <Or>
+            <Method name="start"/>
+            <Method name="stop"/>
+        </Or>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+        <Or>
+            <Class name="io.undertow.predicate.PredicatesHandler$DoneHandlerBuilder$1$1"/>
+            <Class name="io.undertow.predicate.PredicatesHandler$RestartHandlerBuilder$1$1"/>
+            <!-- False positive? -->
+            <Class name="io.undertow.security.impl.GSSAPIAuthenticationMechanism$AcceptSecurityContext"/>
+            <!-- False positive? class def throws exception? -->
+            <Class name="io.undertow.server.protocol.http2.Http2UpgradeHandler"/>
+            <Class name="io.undertow.util.FlexBase64$1"/>
+        </Or>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+        <Or>
+            <Class name="io.undertow.io.AsyncReceiverImpl$2$1"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$2$2"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$2$3"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$3$1"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$3$2"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$3$3"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$4$1"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$4$2"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$4$3"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$5$1"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$5$2"/>
+            <Class name="io.undertow.io.AsyncReceiverImpl$5$3"/>
+            <Class name="io.undertow.predicate.PredicatesHandler"/>
+            <Class name="io.undertow.predicate.PredicatesHandler$DoneHandlerBuilder$1$1"/>
+            <Class name="io.undertow.predicate.PredicatesHandler$RestartHandlerBuilder$1$1"/>
+            <Class name="io.undertow.security.handlers.AbstractConfidentialityHandler"/>
+            <Class name="io.undertow.security.handlers.AbstractSecurityContextAssociationHandler"/>
+            <Class name="io.undertow.security.handlers.AuthenticationCallHandler"/>
+            <Class name="io.undertow.security.handlers.AuthenticationConstraintHandler"/>
+            <Class name="io.undertow.security.handlers.AuthenticationMechanismsHandler"/>
+            <Class name="io.undertow.security.handlers.CachedAuthenticatedSessionHandler"/>
+            <Class name="io.undertow.security.handlers.NotificationReceiverHandler"/>
+            <Class name="io.undertow.server.HttpHandler"/>
+            <Class name="io.undertow.server.JvmRouteHandler"/>
+            <Class name="io.undertow.server.RoutingHandler"/>
+            <Class name="~io.undertow.server.handlers.*"/>
+            <Class name="io.undertow.server.handlers.resource.ResourceHandler"/>
+            <Class name="io.undertow.server.protocol.http.HttpContinue$3$1"/>
+            <Class name="io.undertow.server.protocol.http.HttpContinue$4$1"/>
+            <Class name="io.undertow.server.protocol.http2.Http2UpgradeHandler"/>
+            <Class name="io.undertow.server.protocol.http2.Http2UpgradeHandler$4$1"/>
+            <Class name="io.undertow.server.session.SessionAttachmentHandler"/>
+            <Class name="io.undertow.websockets.WebSocketProtocolHandshakeHandler"/>
+        </Or>
+        <Method name="handleRequest"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+        <Class name="io.undertow.server.RoutingHandler"/>
+        <Method name="handleNoMatch"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+        <Or>
+            <Class name="io.undertow.server.handlers.form.FormDataParser"/>
+            <Class name="io.undertow.server.handlers.form.FormEncodedDataDefinition$FormEncodedDataParser"/>
+            <Class name="io.undertow.server.handlers.form.MultiPartParserDefinition$MultiPartUploadHandler"/>
+        </Or>
+        <Method name="parse"/>
+    </Match>    
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+        <Or>
+            <Class name="io.undertow.server.handlers.resource.ResourceHandler"/>
+        </Or>
+        <Method name="serveResource"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+        <Or>
+            <Class name="io.undertow.server.protocol.http2.Http2UpgradeHandler"/>
+        </Or>
+        <Method name="handleUpgradeBody"/>
+    </Match>
+w    
+    <Match>
+        <!-- Method inherited from Object -->
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_THROWABLE"/>
+        <Or>
+            <Class name="io.undertow.server.DefaultByteBufferPool"/>
+            <Class name="io.undertow.server.DefaultByteBufferPool$LeakDetector"/>
+            <Class name="io.undertow.server.DefaultByteBufferPool$ThreadLocalData"/>
+        </Or>
+    </Match>
+    <!-- I have no idea why this class is so weird -->
+    <Match>
+        <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
+        <Class name="io.undertow.protocols.ssl.SslConduit"/>
+        <Method name="doWrap"/>
+    </Match>
+    <Match>
+        <Bug pattern="VO_VOLATILE_INCREMENT"/>
+        <Or>
+            <Class name="io.undertow.protocols.ssl.SslConduit$5"/>
+            <Class name="io.undertow.protocols.ssl.SslConduit$5$1"/>
+        </Or>
+        <Method name="run"/>
+    </Match>
+    <!-- BLOCK TRY_F_P: spot bugs does not like some try with resources... -->
+    <Match>
+        <Or>
+            <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE"/>
+            <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"/>
+        </Or>
+        <Class name="io.undertow.security.impl.SingleSignOnAuthenticationMechanism"/>
+        <Method name="authenticate"/>
+    </Match>
+    <!-- BLOCK TRY_F_P: END -->
+    <!-- ++ happens in synchro block -->
+    <Match>
+        <Bug pattern="VO_VOLATILE_INCREMENT"/>
+        <Class name="io.undertow.server.session.InMemorySessionManager$SessionImpl"/>
+        <Method name="invalidate"/>
+    </Match>
+    <!-- TODO: this needs review, undertow throws those on purpose. -->
+    <Match>
+        <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"/>
+        <Or>
+            <Class name="io.undertow.Undertow$ListenerInfo"/>
+            <Class name="io.undertow.attribute.ExchangeAttributeParser"/>
+            <Class name="io.undertow.client.http.HttpResponseParser"/>
+            <Class name="io.undertow.conduits.DebuggingStreamSinkConduit"/>
+            <Class name="io.undertow.conduits.DebuggingStreamSourceConduit"/>
+            <Class name="io.undertow.conduits.InflatingStreamSourceConduit"/>
+            <Class name="io.undertow.protocols.ajp.AjpClientChannel"/>
+            <Class name="io.undertow.protocols.alpn.JDK9AlpnProvider"/>
+            <Class name="io.undertow.protocols.alpn.OpenSSLAlpnProvider"/>
+            <Class name="io.undertow.protocols.http2.Http2Channel"/>
+            <Class name="io.undertow.protocols.http2.Http2DataStreamSinkChannel"/>
+            <Class name="io.undertow.protocols.http2.Http2PushBackParser"/>
+            <Class name="io.undertow.protocols.http2.Http2StreamSourceChannel"/>
+            <Class name="io.undertow.protocols.ssl.ALPNHackSSLEngine"/>
+            <Class name="io.undertow.protocols.ssl.ALPNHackServerByteArrayOutputStream"/>
+            <Class name="io.undertow.protocols.ssl.ALPNHackServerHelloExplorer"/>
+            <Class name="io.undertow.security.impl.FormAuthenticationMechanism"/>
+            <Class name="io.undertow.security.impl.GSSAPIAuthenticationMechanism"/>
+            <Class name="io.undertow.server.Connectors"/>
+            <Class name="io.undertow.server.DirectByteBufferDeallocator"/>
+            <Class name="io.undertow.server.handlers.RequestDumpingHandler"/>
+            <Class name="io.undertow.server.handlers.SetAttributeHandler$1"/>
+            <Class name="io.undertow.server.handlers.builder.PredicatedHandlersParser"/>
+            <Class name="io.undertow.server.handlers.error.FileErrorPageHandler$2"/>
+            <Class name="io.undertow.server.handlers.form.FormData"/>
+            <Class name="io.undertow.server.handlers.form.MultiPartParserDefinition$MultiPartUploadHandler"/>
+            <Class name="io.undertow.server.handlers.proxy.HostTable"/>
+            <Class name="io.undertow.server.handlers.proxy.ProxyConnectionPool"/>
+            <Class name="io.undertow.server.handlers.proxy.ProxyHandlerBuilder"/>
+            <Class name="io.undertow.server.handlers.proxy.mod_cluster.MCMPAdvertiseTask"/>
+            <Class name="io.undertow.server.handlers.proxy.mod_cluster.MCMPHandler"/>
+            <Class name="io.undertow.server.handlers.resource.PathResource"/>
+            <Class name="io.undertow.server.handlers.resource.PathResourceManager"/>
+            <Class name="io.undertow.server.handlers.resource.URLResource"/>
+            <Class name="io.undertow.server.protocol.ajp.AjpServerRequestConduit"/>
+            <Class name="io.undertow.server.protocol.framed.AbstractFramedChannel"/>
+            <Class name="io.undertow.server.protocol.http.HttpRequestParser"/>
+            <Class name="io.undertow.server.protocol.http2.Http2UpgradeHandler$1"/>
+            <Class name="io.undertow.server.protocol.http2.Http2UpgradeHandler$3"/>
+            <Class name="io.undertow.server.session.InMemorySessionManager"/>
+            <Class name="io.undertow.server.session.SecureRandomSessionIdGenerator"/>
+            <Class name="io.undertow.util.FileUtils"/>
+            <Class name="io.undertow.util.Headers"/>
+            <Class name="io.undertow.util.Headers$1"/>
+            <Class name="io.undertow.util.MultipartParser$Base64Encoding"/>
+            <Class name="io.undertow.util.PathTemplate"/>
+            <Class name="io.undertow.util.RedirectBuilder"/>
+            <Class name="io.undertow.util.URLUtils$QueryStringParser"/>
+            <Class name="io.undertow.websockets.client.WebSocket13ClientHandshake"/>
+            <Class name="io.undertow.websockets.client.WebSocketClient$ConnectionBuilder"/>
+            <Class name="io.undertow.websockets.core.protocol.version07.WebSocket07Channel$WebSocketFrameHeader"/>
+            <Class name="io.undertow.websockets.core.protocol.version07.WebSocket07FrameSinkChannel"/>
+        </Or>
+    </Match>
+    <!-- This seems on purpose hack? -->
+    <Match>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Class name="io.undertow.servlet.core.ServletExtensionHolder"/>
+        <Method name="getServletExtensions"/>
     </Match>
 </FindBugsFilter>
