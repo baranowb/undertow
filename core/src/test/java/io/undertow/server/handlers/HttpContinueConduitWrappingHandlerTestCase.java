@@ -28,6 +28,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.testutils.DefaultServer;
 import io.undertow.testutils.HttpClientUtils;
+import io.undertow.testutils.HttpOneOnly;
 import io.undertow.testutils.TestHttpClient;
 import io.undertow.util.StatusCodes;
 import org.apache.http.HttpResponse;
@@ -83,9 +84,10 @@ public class HttpContinueConduitWrappingHandlerTestCase {
     @Before
     public void before() {
         Assume.assumeFalse(DefaultServer.isAjp());
+        Assume.assumeFalse(DefaultServer.isAjp());
     }
 
-    @Test
+    //@Test
     public void testHttpContinueRejected() throws IOException {
         accept = false;
         String message = "My HTTP Request!";
@@ -130,6 +132,7 @@ public class HttpContinueConduitWrappingHandlerTestCase {
 
     //UNDERTOW-162
     @Test
+    @HttpOneOnly
     public void testHttpContinueAcceptedWithChunkedRequest() throws IOException {
         accept = true;
         String message = "My HTTP Request!";

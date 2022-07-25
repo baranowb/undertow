@@ -236,12 +236,12 @@ class Http2FrameHeaderParser implements FrameHeaderData {
 
             Http2StreamSourceChannel channel = http2Channel.getIncomingStream(streamId);
             if(channel != null) {
-                if(anyAreClear(flags, Http2Channel.HEADERS_FLAG_END_STREAM)) {
+                if(anyAreClear(flags, Http2Channel.HEADERS_FLAG_END_STREAM) && !((Http2HeadersParser)parser).hasContentLength()) {
                     //this is a protocol error
                     UndertowLogger.REQUEST_IO_LOGGER.debug("Received HTTP/2 trailers header without end stream set");
                     http2Channel.sendGoAway(Http2Channel.ERROR_PROTOCOL_ERROR);
                 }
-                if (!channel.isHeadersEndStream() && anyAreSet(flags, Http2Channel.HEADERS_FLAG_END_HEADERS)) {
+                if (!channel.isHeadersEndStream() && anyAreSet(flags, Http2Channel.HEADERS_FLAG_END_HEADERS) && !((Http2HeadersParser)parser).hasContentLength()) {
                     http2Channel.removeStreamSource(streamId);
                 }
             }

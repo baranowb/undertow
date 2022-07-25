@@ -406,9 +406,9 @@ public abstract class AbstractFramedStreamSourceChannel<C extends AbstractFramed
             }
             waitingForFrame = false;
         }
-        if (anyAreSet(state, STATE_READS_RESUMED)) {
+        //if (anyAreSet(state, STATE_READS_RESUMED)) {
             resumeReadsInternal(true);
-        }
+        //}
         if(headerData != null) {
             currentStreamSize += headerData.getFrameLength();
             if(maxStreamSize > 0 && currentStreamSize > maxStreamSize) {

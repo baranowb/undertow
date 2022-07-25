@@ -21,6 +21,9 @@ package io.undertow.protocols.http2;
 import java.nio.ByteBuffer;
 import org.xnio.Bits;
 
+import io.undertow.util.HeaderMap;
+import io.undertow.util.Headers;
+
 /**
  * Parser for HTTP2 Headers frames
  *
@@ -69,6 +72,15 @@ class Http2HeadersParser extends Http2HeaderBlockParser {
         return true;
     }
 
+    public boolean hasContentLength() {
+        final HeaderMap headerMap = getHeaderMap();
+        if (headerMap.contains(Headers.CONTENT_LENGTH)
+                && Integer.parseInt(headerMap.get(Headers.CONTENT_LENGTH).getFirst()) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     protected int getPaddingLength() {
         return paddingLength;
     }

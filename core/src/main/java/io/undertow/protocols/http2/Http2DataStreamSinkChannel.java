@@ -22,6 +22,7 @@ import io.undertow.UndertowMessages;
 import io.undertow.connector.PooledByteBuffer;
 import io.undertow.server.protocol.framed.SendFrameHeader;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.HeaderValues;
 import io.undertow.util.ImmediatePooledByteBuffer;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
@@ -127,7 +128,7 @@ public class Http2DataStreamSinkChannel extends Http2StreamSinkChannel implement
             firstBuffer.put(0, (byte) ((headerFrameLength >> 16) & 0xFF));
             firstBuffer.put(1, (byte) ((headerFrameLength >> 8) & 0xFF));
             firstBuffer.put(2, (byte) (headerFrameLength & 0xFF));
-            firstBuffer.put(4, (byte) ((isFinalFrameQueued() && !getBuffer().hasRemaining() && frameType == Http2Channel.FRAME_TYPE_HEADERS && trailers == null && !isContinueFrame(headers) ? Http2Channel.HEADERS_FLAG_END_STREAM : 0) | (result == HpackEncoder.State.COMPLETE ? Http2Channel.HEADERS_FLAG_END_HEADERS : 0 ) | (paddingBytes > 0 ? Http2Channel.HEADERS_FLAG_PADDED : 0))); //flags
+            firstBuffer.put(4, (byte) ((isFinalFrameQueued() && !getBuffer().hasRemaining() && (frameType == Http2Channel.FRAME_TYPE_HEADERS && !isContinueFrame(headers)) && trailers == null ? Http2Channel.HEADERS_FLAG_END_STREAM : 0) | (result == HpackEncoder.State.COMPLETE ? Http2Channel.HEADERS_FLAG_END_HEADERS : 0 ) | (paddingBytes > 0 ? Http2Channel.HEADERS_FLAG_PADDED : 0))); //flags
             ByteBuffer currentBuffer = firstBuffer;
 
             if(currentBuffer.remaining() < paddingBytes) {
