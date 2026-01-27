@@ -37,15 +37,19 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Build
+      - name: Build Undertow
         run: |
           cd undertow
           mvn -DskipTests clean install
       - name: Get Undertow Version
-        id: pom-version
-        uses: PERES-Richard/maven-get-version-action@v3.0.0
-        with:
-          path: "undertow"
+        id: undertow-version
+        run: |
+          echo "UNDERTOW_VERSION=`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | sed -n -e '/^\[.*\]/ !{ /^[0-9]/ { p; q } }'`" >> $GITHUB_OUTPUT          
+          # https://github.com/marketplace/actions/get-current-pom-version-of-project ?
+      - name: Build WFLY
+        run: |
+          cd wildfly
+          mvn -DskipTests -Dversion.io.undertow=${{steps.undertow-version.UNDERTOW_VERSION}} clean install
       - name: Tar Maven Repo
         shell: bash
         run: tar -czf maven-repo.tgz -C ~ .m2/repository
@@ -57,4 +61,4 @@ jobs:
       - name: Display structure of downloaded files
         run: |
           ls -a
-          echo "Do RUN ME ${{ steps.pom-version.outputs.version }}"
+          echo "XXX ${{steps.undertow-version.UNDERTOW_VERSION}}"
