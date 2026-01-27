@@ -65,4 +65,4 @@ jobs:
         run: |
           ls -a
           echo "XXX ${{steps.undertow-version.UNDERTOW_VERSION}}"
-          echo "XXX ${{env.UNDERTOW_VERSION}}"
+          echo "XXX $UNDERTOW_VERSION"
