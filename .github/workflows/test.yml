@@ -13,7 +13,7 @@ jobs:
       - uses: n1hility/cancel-previous-runs@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/cache@v6
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: m2-${{ hashFiles('**/pom.xml') }}
@@ -38,7 +38,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build
-        run: mvn -DskipTests clean install
+        run: |
+          cd undertow
+          mvn -DskipTests clean install
       - name: Tar Maven Repo
         shell: bash
         run: tar -czf maven-repo.tgz -C ~ .m2/repository
