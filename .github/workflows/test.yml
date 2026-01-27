@@ -50,8 +50,20 @@ jobs:
           # https://github.com/marketplace/actions/get-current-pom-version-of-project ?
       - name: Build WFLY
         run: |
-          #cd wildfly
-          #mvn -DskipTests -Dversion.io.undertow="$UNDERTOW_VERSION" clean install
+          cd wildfly
+          mvn -DskipTests -Dversion.io.undertow="$UNDERTOW_VERSION" clean install
+          version="`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | sed -n -e '/^\[.*\]/ !{ /^[0-9]/ { p; q } }'`"
+          echo "WILDFLY_VERSION=$version" >> "$GITHUB_ENV"
+          mv wildfly-$version wildfly
+          echo "WILDFLY VERSION: $version"
+      - name: Tar Wildfly Dist
+        shell: bash
+        run: tar -czf wildfly.tgz -C ~ wildfly/ee-dist/target/wildfly
+      - name: Persist Wildfly Dost
+        uses: actions/upload-artifact@v4
+        with:
+          name: wildfly-dist
+          path: wildfly.tgz
       - name: Tar Maven Repo
         shell: bash
         run: tar -czf maven-repo.tgz -C ~ .m2/repository
@@ -67,7 +79,7 @@ jobs:
 
 
 
-  run-servlet-tck:
+  jakarta-servlet-tck:
     name: Run servlet TCK JDK 17
     runs-on: ubuntu-latest
     needs: build-test-package
@@ -77,6 +89,26 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - uses: actions/checkout@v4
+      - name: Download Maven Repo
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-repo
+          path: .
+      - name: Extract Maven Repo
+        shell: bash
+        run: tar -xzf maven-repo.tgz -C ~
+      - name: Download Wildfly Distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: wildfly-dist
+          path: .
+      - name: Extract Maven Repo
+        shell: bash
+        run: tar -xzf maven-repo.tgz -C ~
+      - name: Extract Wildfly Dist
+        shell: bash
+        run: tar -xzf wildfly.tgz -C ~
       - name: Display structure of downloaded files
         run: |
           ls -a
