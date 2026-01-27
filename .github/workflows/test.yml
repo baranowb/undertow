@@ -6,19 +6,30 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-all:
+  build-test-package:
     name: Compile (no tests) with JDK 17
     runs-on: ubuntu-latest
     steps:
-      - name: Display structure of downloaded files
-        run: ls -R
+      - uses: n1hility/cancel-previous-runs@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            m2-
       - uses: actions/checkout@v6
         with:
           path: undertow
+      - uses: actions/checkout@v6
+        with:
+          path: wildfly
+          repository: wildfly/wildfly
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-      - name: Display structure of downloaded files2
-        run: ls -R
+      - name: Display structure of downloaded files
+        run: ls -a
