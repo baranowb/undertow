@@ -12,3 +12,13 @@ jobs:
     steps:
       - name: Display structure of downloaded files
         run: ls -R
+      - uses: actions/checkout@v6
+        with:
+          path: undertow
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Display structure of downloaded files2
+        run: ls -R
