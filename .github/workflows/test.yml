@@ -44,12 +44,13 @@ jobs:
       - name: Get Undertow Version
         id: undertow-version
         run: |
+          cd undertow
           echo "UNDERTOW_VERSION=`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | sed -n -e '/^\[.*\]/ !{ /^[0-9]/ { p; q } }'`" >> $GITHUB_OUTPUT          
           # https://github.com/marketplace/actions/get-current-pom-version-of-project ?
       - name: Build WFLY
         run: |
-          cd wildfly
-          mvn -DskipTests -Dversion.io.undertow=${{steps.undertow-version.UNDERTOW_VERSION}} clean install
+          #cd wildfly
+          #mvn -DskipTests -Dversion.io.undertow=${{steps.undertow-version.UNDERTOW_VERSION}} clean install
       - name: Tar Maven Repo
         shell: bash
         run: tar -czf maven-repo.tgz -C ~ .m2/repository
