@@ -1,4 +1,4 @@
-name: Undertow CI
+name: Fiddling
 
 on:
   pull_request:
