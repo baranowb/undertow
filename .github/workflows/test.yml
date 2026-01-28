@@ -67,7 +67,7 @@ jobs:
       - name: Deploy Undertow To Git Packages
         run: |
           cd undertow
-          mvn deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/baranowb/undertow
+          mvn deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/baranowb/undertow -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get Undertow Version
