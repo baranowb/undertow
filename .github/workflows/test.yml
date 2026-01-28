@@ -89,7 +89,11 @@ jobs:
           echo "WILDFLY VERSION: $version"
       - name: Tar WFLY Dist
         shell: bash
-        run: tar -czf wildfly.tgz -C ~ wildfly/ee-dist/target/wildfly
+        run: |
+          pwd
+          ls wildfly
+          ls  wildfly/ee-dist/target
+          tar -czf wildfly.tgz wildfly/ee-dist/target/wildfly
       - name: Upload WFLY Dist
         uses: actions/upload-artifact@v4
         with:
