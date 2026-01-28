@@ -64,6 +64,9 @@ jobs:
         run: |
           cd undertow
           mvn clean install -DskipTests
+      - name: Deploy Undertow To Git Packages
+        run: |
+          cd undertow
           mvn deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/baranowb/undertow
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
