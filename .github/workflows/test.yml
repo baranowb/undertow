@@ -30,8 +30,8 @@ jobs:
                 "url": "https://repository.jboss.org/nexus/content/groups/public" 
                },
                {
-                "id": "github_packages",
-                "name": "build_packages",
+                "id": "github",
+                "name": "build",
                 "url": "https://maven.pkg.github.com/baranowb/undertow",
                 "snapshots": {
                     "enabled": "true"
@@ -41,7 +41,7 @@ jobs:
           servers: |
             [
               {
-                "id": "github_packages",
+                "id": "github",
                 "username": "${{ github.actor }}",
                 "password": "${{ secrets.GITHUB_TOKEN }}"
               }
@@ -64,7 +64,7 @@ jobs:
         run: |
           cd undertow
           mvn -DskipTests clean install
-          mvn deploy -DaltDeploymentRepository=github_packages::https://maven.pkg.github.com/baranowb/undertow
+          mvn deploy -DaltDeploymentRepository=github::https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@maven.pkg.github.com/baranowb/undertow
       - name: Get Undertow Version
         id: undertow-version
         run: |
