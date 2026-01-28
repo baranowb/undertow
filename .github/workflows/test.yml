@@ -83,16 +83,13 @@ jobs:
           mvn -DskipTests -Dversion.io.undertow="$UNDERTOW_VERSION" clean install
           version="`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | sed -n -e '/^\[.*\]/ !{ /^[0-9]/ { p; q } }'`"
           echo "WILDFLY_VERSION=$version" >> "$GITHUB_ENV"
-          echo "WILDFLY VERSION: $version"
-          ls ee-dist/target/
           mv -v ee-dist/target/wildfly-$version ee-dist/target/wildfly
-          echo "WILDFLY VERSION: $version"
       - name: Tar WFLY Dist
         shell: bash
         run: |
           pwd
-          ls wildfly
-          ls  wildfly/ee-dist/target
+          ls -a
+          ls -a ../
           tar -czf wildfly.tgz wildfly/ee-dist/target/wildfly
       - name: Upload WFLY Dist
         uses: actions/upload-artifact@v4
@@ -186,6 +183,7 @@ jobs:
       - name: Display structure of downloaded files
         run: |
           ls -a
+          ls undertow
           pwd
       - name: Run Servlet TCK
         run: |
