@@ -87,10 +87,9 @@ jobs:
       - name: Tar WFLY Dist
         shell: bash
         run: |
-          pwd
-          ls -a
-          ls -a ../
           tar -czf wildfly.tgz wildfly/ee-dist/target/wildfly
+          echo "====================="
+          tar -tf wildfly.tgz
       - name: Upload WFLY Dist
         uses: actions/upload-artifact@v4
         with:
@@ -182,9 +181,11 @@ jobs:
         run: tar -xzf wildfly.tgz -C ~
       - name: Display structure of downloaded files
         run: |
+          echo "====================="
           ls -a
-          ls undertow
+          echo "====================="
           pwd
+          echo "====================="
       - name: Run Servlet TCK
         run: |
           export JBOSS_HOME=`pwd`/wildfly
