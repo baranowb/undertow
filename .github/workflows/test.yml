@@ -88,6 +88,9 @@ jobs:
         shell: bash
         run: |
           tar -czf wildfly.tgz -C wildfly/ee-dist/target wildfly
+          echo "==================="
+          tar -tf wildfly.tgz
+          echo "==================="
       - name: Upload WFLY Dist
         uses: actions/upload-artifact@v4
         with:
@@ -95,7 +98,11 @@ jobs:
           path: wildfly.tgz
       - name: Tar Maven Repo
         shell: bash
-        run: tar -czf maven-repo.tgz -C ~ .m2/repository
+        run: |
+          tar -czf maven-repo.tgz -C ~ .m2/repository
+          echo "==================="
+          tar -tf maven-repo.tgz
+          echo "==================="
       - name: Upload Maven Repo
         uses: actions/upload-artifact@v4
         with:
@@ -173,16 +180,28 @@ jobs:
           path: .
       - name: Extract Maven Repo
         shell: bash
-        run: tar -xzf maven-repo.tgz -C ~
+        run: |
+          echo "Extracting maven repo to:"
+          echo "==================="
+          pwd
+          echo "==================="
+          ls -a
+          echo "==================="
+          tar -tf maven-repo.tgz
+          tar -xzf maven-repo.tgz -C ~
+          echo "==================="
+          ls -a
       - name: Extract Wildfly Dist
         shell: bash
-        run: tar -xzf wildfly.tgz -C ~
+        run: |
+          echo "Exctracting WFLY"
+          tar -tf wildfly.tgz
+          tar -xzf wildfly.tgz -C ~
       - name: Display structure of downloaded files
         run: |
           echo "====================="
-          ls -a
-          echo "====================="
           pwd
+          ls -a
           echo "====================="
           ls -a ../
       - name: Run Servlet TCK
