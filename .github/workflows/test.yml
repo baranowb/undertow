@@ -47,6 +47,9 @@ jobs:
           cd undertow
           version="`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | sed -n -e '/^\[.*\]/ !{ /^[0-9]/ { p; q } }'`"
           echo "UNDERTOW_VERSION=$version" >> "$GITHUB_ENV"
+          echo "V: $version"
+          ls ~/.m2/repository
+          ls ~/.m2/repository/org/undertow/core
           # https://github.com/marketplace/actions/get-current-pom-version-of-project ?
       - name: Build WFLY
         run: |
