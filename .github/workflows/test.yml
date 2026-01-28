@@ -22,7 +22,30 @@ jobs:
       - name: Generate settings.xml for Maven Builds
         uses: whelk-io/maven-settings-xml-action@v21
         with:
-          repositories: '[{ "id": "jboss", "name": "JBoss", "url": "https://repository.jboss.org/nexus/content/groups/public" }]'
+          repositories: |
+            [
+              { 
+                "id": "jboss", 
+                "name": "JBoss", 
+                "url": "https://repository.jboss.org/nexus/content/groups/public" 
+               },
+               {
+                "id": "github_packages",
+                "name": "build_packages",
+                "url": "https://maven.pkg.github.com/baranowb/undertow",
+                "snapshots": {
+                    "enabled": "true"
+                  }  
+               }
+            ]
+          servers: |
+            [
+              {
+                "id": "github_packages",
+                "username": "${{ github.actor }}",
+                "password": "${{ secrets.GITHUB_TOKEN }}"
+              }
+            ]
       - name: Print Version
         run: mvn -v
       - uses: actions/checkout@v6
@@ -41,6 +64,7 @@ jobs:
         run: |
           cd undertow
           mvn -DskipTests clean install
+          mvn deploy
       - name: Get Undertow Version
         id: undertow-version
         run: |
