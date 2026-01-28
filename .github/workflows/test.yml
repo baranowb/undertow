@@ -64,7 +64,9 @@ jobs:
         run: |
           cd undertow
           mvn -DskipTests clean install
-          mvn deploy -DaltDeploymentRepository=github::https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@maven.pkg.github.com/baranowb/undertow
+          mvn deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/baranowb/undertow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get Undertow Version
         id: undertow-version
         run: |
