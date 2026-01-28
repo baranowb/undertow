@@ -87,7 +87,8 @@ jobs:
       - name: Tar WFLY Dist
         shell: bash
         run: |
-          tar -czf wildfly.tgz wildfly/ee-dist/target/wildfly
+          cd 
+          tar -czf wildfly.tgz -C wildfly/ee-dist/target wildfly
           echo "====================="
           tar -tf wildfly.tgz
       - name: Upload WFLY Dist
