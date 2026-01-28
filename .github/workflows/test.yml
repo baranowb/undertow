@@ -63,7 +63,7 @@ jobs:
       - name: Build Undertow
         run: |
           cd undertow
-          mvn -DskipTests clean install
+          mvn clean install -DskipTests
           mvn deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/baranowb/undertow
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
