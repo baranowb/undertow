@@ -88,8 +88,6 @@ jobs:
         shell: bash
         run: |
           tar -czf wildfly.tgz -C wildfly/ee-dist/target wildfly
-          echo "====================="
-          tar -tf wildfly.tgz
       - name: Upload WFLY Dist
         uses: actions/upload-artifact@v4
         with:
@@ -186,9 +184,11 @@ jobs:
           echo "====================="
           pwd
           echo "====================="
+          ls -a ../
       - name: Run Servlet TCK
         run: |
-          export JBOSS_HOME=`pwd`/wildfly
+          export JBOSS_HOME=${{ github.workspace }}/wildfly
+          
           cd wildfly-tck-runners/jakarta-ee-tck-runners/servlet-tck
           mvn install
           
