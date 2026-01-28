@@ -39,8 +39,8 @@ jobs:
           java-version: 17
       - name: Build Undertow
         run: |
-          #cd undertow
-          #mvn -DskipTests clean install
+          cd undertow
+          mvn -DskipTests clean install
       - name: Get Undertow Version
         id: undertow-version
         run: |
