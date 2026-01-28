@@ -1,4 +1,4 @@
-name: Fiddling
+name: Undertow Servlet TCK
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-test-package:
-    name: Compile (no tests) with JDK 17
+    name: Compile assets with JDK 17(no tests)
     runs-on: ubuntu-latest
     steps:
       - uses: n1hility/cancel-previous-runs@v3
@@ -83,12 +83,12 @@ jobs:
           mvn -DskipTests -Dversion.io.undertow="$UNDERTOW_VERSION" clean install
           version="`mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | sed -n -e '/^\[.*\]/ !{ /^[0-9]/ { p; q } }'`"
           echo "WILDFLY_VERSION=$version" >> "$GITHUB_ENV"
-          mv wildfly-$version wildfly
+          mv ee-dist/target/wildfly-$version ee-dist/target/wildfly
           echo "WILDFLY VERSION: $version"
-      - name: Tar Wildfly Dist
+      - name: Tar WFLY Dist
         shell: bash
         run: tar -czf wildfly.tgz -C ~ wildfly/ee-dist/target/wildfly
-      - name: Persist Wildfly Dost
+      - name: Upload WFLY Dist
         uses: actions/upload-artifact@v4
         with:
           name: wildfly-dist
@@ -96,7 +96,7 @@ jobs:
       - name: Tar Maven Repo
         shell: bash
         run: tar -czf maven-repo.tgz -C ~ .m2/repository
-      - name: Persist Maven Repo
+      - name: Upload Maven Repo
         uses: actions/upload-artifact@v4
         with:
           name: maven-repo
