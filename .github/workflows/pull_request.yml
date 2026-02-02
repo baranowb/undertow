@@ -35,7 +35,7 @@ jobs:
           do
             if [ "$rev" != "${{ github.event.pull_request.user.login }}" ]; then
               echo "adding '$rev' to reviewer list."
-              if [[-z "$myVar"]]; then
+              if [[ "$reviewers" == "" ]]; then
                 reviewers="$rev"
               else
                 reviewers="$reviewers, $rev"
