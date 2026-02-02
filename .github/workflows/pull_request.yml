@@ -31,11 +31,9 @@ jobs:
           #this needs to be done since github wont allow author to be assigned
           reviewers_init='baranowb frainone jamezp jasondlee ropalka'
           reviewers=''
-          echo "AUTHOR: ${{ github.event.pull_request.user.login }}"
-          echo "AUTHOR: $reviewers_init"
+
           for rev in $reviewers_init
           do
-            echo "CHUNK: '$rev' '${{ github.event.pull_request.user.login }}'"
             if [ "$rev" != "${{ github.event.pull_request.user.login }}" ]; then
               echo "adding '$rev' to reviewer list."
               if [[ "$reviewers" == "" ]]; then
@@ -50,10 +48,9 @@ jobs:
 
           echo "Reviewers: '$reviewers'"
           echo "REVIEWERS=$reviewers" >> "$GITHUB_ENV"
-          # https://github.com/marketplace/actions/get-current-pom-version-of-project ?
       - name: Add Pull Request Reviewer
         uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
-          #reviewers: "$REVIEWERS"
-          reviewrs: baranowb
+          reviewers: "$REVIEWERS"
+          #reviewrs: baranowb
           token: ${{ secrets.GITHUB_TOKEN }}
