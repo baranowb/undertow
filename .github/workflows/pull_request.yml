@@ -3,7 +3,8 @@ name: Pull Request Metadata
 on:
   workflow_dispatch:
   pull_request:
-    types: [synchronize, opened]
+    #types: [synchronize, opened]
+    types: [opened]
 #    branches:
 #      - '*'
 
@@ -22,7 +23,7 @@ jobs:
             under verification
             waiting peer review
   
-  add_reviewers1:
+  add_reviewers:
     runs-on: ubuntu-latest
     steps:
       - name: Vet reviewer list
@@ -39,7 +40,7 @@ jobs:
               if [[ "$reviewers" == "" ]]; then
                 reviewers="$rev"
               else
-                reviewers="$reviewers, $rev"
+                reviewers="$reviewers,$rev"
               fi
             else
               echo "Ignoring '$rev' as he is author"
@@ -52,5 +53,4 @@ jobs:
         uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
           reviewers: "$REVIEWERS"
-          #reviewrs: baranowb
           token: ${{ secrets.GITHUB_TOKEN }}
