@@ -18,11 +18,15 @@ jobs:
         uses: actions-ecosystem/action-add-labels@v1
         if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
         with:
-          labels: ["waiting CI check", "under verification", "waiting peer review"]
+          labels: |
+            "waiting CI check"
+            "under verification"
+            "waiting peer review"
   add_reviewers:
+    runs-on: ubuntu-latest
     steps:
       - name: Add Pull Request Reviewer
-            uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
-            with:
-              reviewers: ["baranowb", "ropalka", "frainone", "jamezp", "jasondlee"]
-              token: ${{ secrets.GITHUB_TOKEN }}
+        uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
+        with:
+          reviewers: baranowb,ropalka,frainone,jamezp,jasondlee
+          token: ${{ secrets.GITHUB_TOKEN }}
