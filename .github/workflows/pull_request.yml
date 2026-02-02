@@ -1,6 +1,7 @@
 name: Pull Request Metadata
 
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - opened
