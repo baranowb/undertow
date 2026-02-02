@@ -28,5 +28,5 @@ jobs:
       - name: Add Pull Request Reviewer
         uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
-          reviewers: baranowb,ropalka,frainone,jamezp,jasondlee
+          reviewers: baranowb
           token: ${{ secrets.GITHUB_TOKEN }}
