@@ -32,8 +32,10 @@ jobs:
           reviewers_init='"baranowb frainone jamezp jasondlee ropalka"'
           reviewers=''
           echo "AUTHOR: ${{ github.event.pull_request.user.login }}"
+          echo "AUTHOR: $reviewers_init"
           for rev in $reviewers_init
           do
+            echo "CHUNK: '$rev' '${{ github.event.pull_request.user.login }}'"
             if [ "$rev" != "${{ github.event.pull_request.user.login }}" ]; then
               echo "adding '$rev' to reviewer list."
               if [[ "$reviewers" == "" ]]; then
@@ -52,5 +54,6 @@ jobs:
       - name: Add Pull Request Reviewer
         uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
-          reviewers: "$REVIEWERS"
+          #reviewers: "$REVIEWERS"
+          reviewrs: baranowb
           token: ${{ secrets.GITHUB_TOKEN }}
