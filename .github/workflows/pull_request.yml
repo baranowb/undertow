@@ -3,8 +3,8 @@ name: Pull Request Metadata
 on:
   workflow_dispatch:
   pull_request:
-    types:
-      - opened
+    types: [synchronize, opened]
+    #types: opened
 #    branches:
 #      - '*'
 
@@ -17,17 +17,39 @@ jobs:
 
       - name: add label
         uses: actions-ecosystem/action-add-labels@v1
-        if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
         with:
           labels: |
-            "waiting CI check"
-            "under verification"
-            "waiting peer review"
+            waiting CI check
+            waiting peer review
+  
   add_reviewers:
     runs-on: ubuntu-latest
     steps:
+      - name: Vet reviewer list
+        id: reviewers
+        run: |
+          #this needs to be done since github wont allow author to be assigned
+          reviewers_init='baranowb frainone jamezp jasondlee ropalka'
+          reviewers=''
+
+          for rev in $reviewers_init
+          do
+            if [ "$rev" != "${{ github.event.pull_request.user.login }}" ]; then
+              echo "adding '$rev' to reviewer list."
+              if [[ "$reviewers" == "" ]]; then
+                reviewers="$rev"
+              else
+                reviewers="$reviewers,$rev"
+              fi
+            else
+              echo "Ignoring '$rev' as he is author"
+            fi
+          done
+
+          echo "Reviewers: '$reviewers'"
+          echo "REVIEWERS=$reviewers" >> "$GITHUB_ENV"
       - name: Add Pull Request Reviewer
         uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
-          reviewers: baranowb
+          reviewers: "$REVIEWERS"
           token: ${{ secrets.GITHUB_TOKEN }}
