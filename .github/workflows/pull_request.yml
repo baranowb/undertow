@@ -18,9 +18,9 @@ jobs:
         uses: actions-ecosystem/action-add-labels@v1
         with:
           labels: |
-            "waiting CI check"
-            "under verification"
-            "waiting peer review"
+            waiting CI check
+            under verification
+            waiting peer review
   add_reviewers:
     runs-on: ubuntu-latest
     steps:
