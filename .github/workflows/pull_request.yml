@@ -31,7 +31,7 @@ jobs:
           #this needs to be done since github wont allow author to be assigned
           reviewers_init='"baranowb frainone jamezp jasondlee ropalka"'
           reviewers=''
-          for rev in $variable
+          for rev in $reviewers_init
           do
             if [ "$rev" != "${{ github.event.pull_request.user.login }}" ]; then
               echo "adding '$rev' to reviewer list."
