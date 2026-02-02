@@ -22,21 +22,34 @@ jobs:
             under verification
             waiting peer review
   
-  add_reviewers:
+  add_reviewers1:
     runs-on: ubuntu-latest
     steps:
-      - name: Assign reviewers
-        uses: ks-keshava-rao/add-reviewers@v1
-        with:
-           reviewers: baranowb
-           token: "${{ secrets.GITHUB_TOKEN }}"
-           debugMode: true
+      - name: Vet reviewer list
+        id: reviewers
+        run: |
+          #this needs to be done since github wont allow author to be assigned
+          reviewers_init='"baranowb frainone jamezp jasondlee ropalka"'
+          reviewers=''
+          for rev in $variable
+          do
+            if [ "$rev" != "${{ github.event.pull_request.user.login }}" ]; then
+              echo "adding '$rev' to reviewer list."
+              if [[-z "$myVar"]]; then
+                reviewers="$rev"
+              else
+                reviewers="$reviewers, $rev"
+              fi
+            else
+              echo "Ignoring '$rev' as he is author"
+            fi
+          done
 
-  add_reviewers2:
-    runs-on: ubuntu-latest
-    steps:
+          echo "Reviewers: '$reviewers'"
+          echo "REVIEWERS=$reviewers" >> "$GITHUB_ENV"
+          # https://github.com/marketplace/actions/get-current-pom-version-of-project ?
       - name: Add Pull Request Reviewer
         uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
-          reviewers: baranowb
+          reviewers: "$REVIEWERS"
           token: ${{ secrets.GITHUB_TOKEN }}
