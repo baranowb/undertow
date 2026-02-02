@@ -21,6 +21,7 @@ jobs:
             waiting CI check
             under verification
             waiting peer review
+  
   add_reviewers:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +31,7 @@ jobs:
            reviewers: baranowb
            token: "${{ secrets.GITHUB_TOKEN }}"
            debugMode: true
-           id: assign_reviewers
+
   add_reviewers2:
     runs-on: ubuntu-latest
     steps:
