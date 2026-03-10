@@ -243,6 +243,22 @@ public class Cookies {
         return retVal;
     }
 
+    static Map<String, Cookie> parseRequestCookies(int maxCookies, boolean allowEqualInValue, List<String> cookies, boolean commaIsSeperator, boolean allowHttpSepartorsV0, boolean rfc6265ParsingDisabled ) {
+        if (cookies == null) {
+            return new TreeMap<>();
+        }
+        final Set<Cookie> parsedCookies = new HashSet<>();
+        for (String cookie : cookies) {
+            parseCookie(cookie, parsedCookies, maxCookies, allowEqualInValue, commaIsSeperator, allowHttpSepartorsV0, rfc6265ParsingDisabled);
+        }
+
+        final Map<String, Cookie> retVal = new TreeMap<>();
+        for (Cookie cookie : parsedCookies) {
+            retVal.put(cookie.getName(), cookie);
+        }
+        return retVal;
+    }
+
     static void parseRequestCookies(int maxCookies, boolean allowEqualInValue, List<String> cookies, Set<Cookie> parsedCookies, boolean commaIsSeperator, boolean allowHttpSepartorsV0) {
         if (cookies != null) {
             for (String cookie : cookies) {
@@ -323,20 +339,47 @@ public class Cookies {
                         if (!rfc6265ParsingDisabled && inQuotes) {
                             // RFC 6265 requires quoted values to remain quoted
                             start = start - 1;
-                            i++;
-                            cookieCount = createCookie(name, containsEscapedQuotes ? unescapeDoubleQuotes(cookie.substring(start, i)) : cookie.substring(start, i), maxCookies, cookieCount, cookies, additional);
+                            //i++;
+                            cookieCount = createCookie(name, containsEscapedQuotes ? unescapeDoubleQuotes(cookie.substring(start, i + 1)) : cookie.substring(start, i + 1), maxCookies, cookieCount, cookies, additional);
                         } else {
                             cookieCount = createCookie(name, containsEscapedQuotes ? unescapeDoubleQuotes(cookie.substring(start, i)) : cookie.substring(start, i), maxCookies, cookieCount, cookies, additional);
                         }
                         inQuotes = false;
-                        state = 0;
-                        start = i + 1;
+                      //if there is more, make sure next is separator
+                        if (i + 1 < cookie.length() && (cookie.charAt(i + 1) == ';'      // Cookie: key="\"; key2=...
+                                || (commaIsSeperator && cookie.charAt(i + 1) == ','))    // Cookie: key="\", key2=...
+                                || i+1 == cookie.length()) {  //end of cookie
+                           //spin around, its ok.
+
+                        } else {
+                            // Cookie: key="\" SOMEMORE; key2=...
+                            if(UndertowLogger.REQUEST_LOGGER.isTraceEnabled()) {
+                                UndertowLogger.REQUEST_LOGGER.trace("Ignoring invalid cookies in header '" + cookie+"', cookie: '"+name+"'");
+                            }
+                            // this is enough, it wont be added in th end.
+                            cookies.remove(name);
+                            name = null;
+
+                            // seek next separator
+                            int seekIndex = i + 1;
+                            while (seekIndex < cookie.length()) {
+                                final char seeker = cookie.charAt(seekIndex);
+                                if (!(seeker == ';' // Cookie: key="\"; key2=...
+                                        || (commaIsSeperator && seeker == ','))) {
+                                    seekIndex++;
+                                } else {
+                                    break;
+                                }
+                            }
+                            start = seekIndex;
+                            i = seekIndex - 1;
+                            //this will fall into state == 3 and below if
+                        }
                     } else if (c == ';' || (commaIsSeperator && c == ',')) {
                         state = 0;
                         start = i + 1;
-                    }
-                    // Skip the next double quote char '"' when it is escaped by backslash '\' (i.e. \") inside the quoted value
-                    if (c == '\\' && (i + 1 < cookie.length()) && cookie.charAt(i + 1) == '"') {
+                    } else if (c == '\\' && (i + 1 < cookie.length()) && cookie.charAt(i + 1) == '"') {
+                        // Skip the next double quote char '"' when it is escaped by backslash '\' (i.e. \") inside the quoted value
                         // But..., do not skip at the following conditions
                         if (i + 2 == cookie.length()) { // Cookie: key="\" or Cookie: key="...\"
                             break;
@@ -400,6 +443,13 @@ public class Cookies {
 
     private static int createCookie(final String name, final String value, int maxCookies, int cookieCount,
             final Map<String, String> cookies, final Map<String, String> additional) {
+        if(name == null) {
+            if(UndertowLogger.REQUEST_LOGGER.isTraceEnabled()) {
+                UndertowLogger.REQUEST_LOGGER.trace("Unexpected input detected, corrupted parse.");
+            }
+
+            return cookieCount;
+        }
         if (!name.isEmpty() && name.charAt(0) == '$') {
             if(additional.containsKey(name)) {
                 return cookieCount;
