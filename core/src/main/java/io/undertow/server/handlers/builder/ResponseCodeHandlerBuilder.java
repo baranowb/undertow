@@ -29,6 +29,8 @@ import java.util.Set;
 
 /**
  * @author Stuart Douglas
+ * @see {@link ResponseCodeHandler#Builder}
+ * @Deprecated(since = "2.5.0", forRemoval = true)
  */
 public class ResponseCodeHandlerBuilder implements HandlerBuilder {
     @Override
