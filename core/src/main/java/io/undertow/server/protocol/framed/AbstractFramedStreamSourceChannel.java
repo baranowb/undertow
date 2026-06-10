@@ -476,17 +476,17 @@ public abstract class AbstractFramedStreamSourceChannel<C extends AbstractFramed
 
     @Override
     public boolean supportsOption(Option<?> option) {
-        return false;
+        return this.framedChannel.supportsOption(option);
     }
 
     @Override
     public <T> T getOption(Option<T> tOption) throws IOException {
-        return null;
+        return this.framedChannel.getOption(tOption);
     }
 
     @Override
     public <T> T setOption(Option<T> tOption, T t) throws IllegalArgumentException, IOException {
-        return null;
+        return this.framedChannel.setOption(tOption, t);
     }
 
     @Override

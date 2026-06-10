@@ -73,6 +73,7 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 import io.undertow.util.StatusCodes;
 import io.undertow.util.URLUtils;
+import io.undertow.util.UpdatetableOptionHandler;
 
 import static io.undertow.protocols.http2.Http2Channel.AUTHORITY;
 import static io.undertow.protocols.http2.Http2Channel.METHOD;
@@ -95,7 +96,8 @@ public class Http2ServerConnection extends ServerConnection {
     private final ConduitStreamSourceChannel conduitStreamSourceChannel;
     private final StreamSinkConduit originalSinkConduit;
     private final StreamSourceConduit originalSourceConduit;
-    private final OptionMap undertowOptions;
+    //private final OptionMap undertowOptions;
+    private final UpdatetableOptionHandler undertowOptions;
     private final int bufferSize;
     private SSLSessionInfo sessionInfo;
     private final HttpHandler rootHandler;
@@ -107,7 +109,7 @@ public class Http2ServerConnection extends ServerConnection {
     public Http2ServerConnection(Http2Channel channel, Http2StreamSourceChannel requestChannel, OptionMap undertowOptions, int bufferSize, HttpHandler rootHandler) {
         this.channel = channel;
         this.requestChannel = requestChannel;
-        this.undertowOptions = undertowOptions;
+        this.undertowOptions = new UpdatetableOptionHandler(undertowOptions);
         this.bufferSize = bufferSize;
         this.rootHandler = rootHandler;
         responseChannel = requestChannel.getResponseChannel();
@@ -133,7 +135,7 @@ public class Http2ServerConnection extends ServerConnection {
         this.channel = channel;
         this.rootHandler = rootHandler;
         this.requestChannel = null;
-        this.undertowOptions = undertowOptions;
+        this.undertowOptions = new UpdatetableOptionHandler(undertowOptions);
         this.bufferSize = bufferSize;
         responseChannel = sinkChannel;
         originalSinkConduit = new StreamSinkChannelWrappingConduit(responseChannel);
@@ -245,18 +247,18 @@ public class Http2ServerConnection extends ServerConnection {
     }
 
     @Override
-    public boolean supportsOption(Option<?> option) {
-        return false;
+    public boolean innerSupportsOption(final Option<?> option) {
+        return channel.supportsOption(option);
     }
 
     @Override
-    public <T> T getOption(Option<T> option) throws IOException {
-        return null;
+    public <T> T getInnerOption(final Option<T> option) throws IOException {
+        return channel.getOption(option);
     }
 
     @Override
-    public <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException {
-        return null;
+    public <T> T setInnerOption(final Option<T> option, final T value) throws IllegalArgumentException, IOException {
+        return channel.setOption(option, value);
     }
 
     @Override
@@ -290,7 +292,7 @@ public class Http2ServerConnection extends ServerConnection {
     }
 
     @Override
-    public OptionMap getUndertowOptions() {
+    protected UpdatetableOptionHandler getUpdatableOptions() {
         return undertowOptions;
     }
 

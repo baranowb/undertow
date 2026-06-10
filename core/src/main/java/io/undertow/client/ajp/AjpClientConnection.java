@@ -64,6 +64,7 @@ import io.undertow.protocols.ajp.AjpClientRequestClientStreamSinkChannel;
 import io.undertow.protocols.ajp.AjpClientResponseStreamSourceChannel;
 import io.undertow.util.AbstractAttachable;
 import io.undertow.util.Protocols;
+import io.undertow.util.UpdatetableOptionHandler;
 
 /**
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
@@ -93,7 +94,8 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
     private final Deque<AjpClientExchange> pendingQueue = new ArrayDeque<>();
     private AjpClientExchange currentRequest;
 
-    private final OptionMap options;
+    //private final OptionMap options;
+    private final UpdatetableOptionHandler options;
     private final AjpClientChannel ajpClientChannel;
 
     private final ByteBufferPool bufferPool;
@@ -111,7 +113,7 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
 
     AjpClientConnection(final AjpClientChannel ajpClientChannel, final OptionMap options, final ByteBufferPool bufferPool, ClientStatistics clientStatistics) {
         this.clientStatistics = clientStatistics;
-        this.options = options;
+        this.options = new UpdatetableOptionHandler(options);
         this.ajpClientChannel = ajpClientChannel;
         this.bufferPool = bufferPool;
 
@@ -187,18 +189,29 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
 
     @Override
     public boolean supportsOption(Option<?> option) {
+        if(this.options.supportsOption(option)) {
+            return true;
+        }
         return ajpClientChannel.supportsOption(option);
     }
 
 
     @Override
     public <T> T getOption(Option<T> option) throws IOException {
-        return ajpClientChannel.getOption(option);
+        if(this.options.supportsOption(option)) {
+            return this.options.getOption(option);
+        } else {
+            return ajpClientChannel.getOption(option);
+        }
     }
 
     @Override
     public <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException {
-        return ajpClientChannel.setOption(option, value);
+        if(this.options.supportsOption(option)) {
+            return this.options.setOption(option, value);
+        } else {
+            return ajpClientChannel.setOption(option, value);
+        }
     }
 
     @Override

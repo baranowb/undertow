@@ -640,17 +640,17 @@ public abstract class AbstractFramedStreamSinkChannel<C extends AbstractFramedCh
 
     @Override
     public boolean supportsOption(Option<?> option) {
-        return false;
+        return this.channel.supportsOption(option);
     }
 
     @Override
     public <T> T getOption(Option<T> tOption) throws IOException {
-        return null;
+        return this.channel.getOption(tOption);
     }
 
     @Override
     public <T> T setOption(Option<T> tOption, T t) throws IllegalArgumentException, IOException {
-        return null;
+        return this.channel.setOption(tOption, t);
     }
 
     public ByteBuffer getBuffer() {

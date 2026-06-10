@@ -51,6 +51,8 @@ import io.undertow.util.Methods;
 import io.undertow.util.PooledAdaptor;
 import io.undertow.util.Protocols;
 import io.undertow.util.StatusCodes;
+import io.undertow.util.UpdatetableOptionHandler;
+
 import org.jboss.logging.Logger;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -118,7 +120,8 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
     private HttpClientExchange currentRequest;
     private HttpResponseBuilder pendingResponse;
 
-    private final OptionMap options;
+    //private final OptionMap options;
+    private final UpdatetableOptionHandler options;
     private final StreamConnection connection;
     private final PushBackStreamSourceConduit pushBackStreamSourceConduit;
     private final ClientReadListener clientReadListener = new ClientReadListener();
@@ -167,7 +170,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
         } else {
             clientStatistics = null;
         }
-        this.options = options;
+        this.options = new UpdatetableOptionHandler(options);
         this.connection = connection;
         this.pushBackStreamSourceConduit = new PushBackStreamSourceConduit(connection.getSourceChannel().getConduit());
         this.connection.getSourceChannel().setConduit(pushBackStreamSourceConduit);
@@ -261,6 +264,9 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
 
     @Override
     public boolean supportsOption(Option<?> option) {
+        if(this.options.supportsOption(option)) {
+            return true;
+        }
         if(http2Delegate != null) {
             return http2Delegate.supportsOption(option);
         }
@@ -270,6 +276,9 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
 
     @Override
     public <T> T getOption(Option<T> option) throws IOException {
+        if(this.options.supportsOption(option)) {
+            return this.options.getOption(option);
+        }
         if(http2Delegate != null) {
             return http2Delegate.getOption(option);
         }
@@ -278,6 +287,9 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
 
     @Override
     public <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException {
+        if(this.options.supportsOption(option)) {
+            return this.options.getOption(option, value);
+        }
         if(http2Delegate != null) {
             return http2Delegate.setOption(option, value);
         }
@@ -361,9 +373,9 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
         }
         final HttpClientExchange httpClientExchange = new HttpClientExchange(clientCallback, request, this);
         boolean ssl = this.connection instanceof SslConnection;
-        if(!ssl && !http2Tried && options.get(UndertowOptions.ENABLE_HTTP2, UndertowOptions.DEFAULT_ENABLE_HTTP2) && !request.getRequestHeaders().contains(Headers.UPGRADE)) {
+        if(!ssl && !http2Tried && options.getOption(UndertowOptions.ENABLE_HTTP2, UndertowOptions.DEFAULT_ENABLE_HTTP2) && !request.getRequestHeaders().contains(Headers.UPGRADE)) {
             //this is the first request, as we want to try a HTTP2 upgrade
-            request.getRequestHeaders().put(new HttpString("HTTP2-Settings"), Http2ClearClientProvider.createSettingsFrame(options, bufferPool));
+            request.getRequestHeaders().put(new HttpString("HTTP2-Settings"), Http2ClearClientProvider.createSettingsFrame(options.getOptionsMap(), bufferPool));
             request.getRequestHeaders().put(Headers.UPGRADE, Http2Channel.CLEARTEXT_UPGRADE_STRING);
             request.getRequestHeaders().put(Headers.CONNECTION, "Upgrade, HTTP2-Settings");
             http2Tried = true;
@@ -715,7 +727,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
     protected void doHttp2Upgrade() {
         try {
             StreamConnection connectedStreamChannel = this.performUpgrade();
-            Http2Channel http2Channel = new Http2Channel(connectedStreamChannel, null, bufferPool, null, true, true, options);
+            Http2Channel http2Channel = new Http2Channel(connectedStreamChannel, null, bufferPool, null, true, true, options.getOptionsMap());
             Http2ClientConnection http2ClientConnection = new Http2ClientConnection(http2Channel, currentRequest.getResponseCallback(), currentRequest.getRequest(), currentRequest.getRequest().getRequestHeaders().getFirst(Headers.HOST), clientStatistics, false);
             http2ClientConnection.getCloseSetter().set(new ChannelListener<ClientConnection>() {
                 @Override

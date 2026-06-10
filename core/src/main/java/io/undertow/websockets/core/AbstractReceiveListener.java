@@ -22,6 +22,8 @@ import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
 import org.xnio.Pooled;
 
+import io.undertow.UndertowOptions;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -35,6 +37,7 @@ public abstract class AbstractReceiveListener implements ChannelListener<WebSock
     @Override
     public void handleEvent(WebSocketChannel channel) {
         try {
+            channel.supportsOption(UndertowOptions.AJP_ALLOWED_REQUEST_ATTRIBUTES_PATTERN);
             final StreamSourceFrameChannel result = channel.receive();
             if (result == null) {
                 return;

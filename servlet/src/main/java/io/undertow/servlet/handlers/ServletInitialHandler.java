@@ -45,6 +45,8 @@ import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Protocols;
 import io.undertow.util.StatusCodes;
+import io.undertow.util.UpdatetableOptionHandler;
+
 import org.xnio.ChannelListener;
 import org.xnio.Option;
 import org.xnio.OptionMap;
@@ -524,6 +526,30 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         @Override
         public boolean isRequestTrailerFieldsSupported() {
             return false;
+        }
+
+        @Override
+        protected boolean innerSupportsOption(Option<?> option) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        protected <T> T getInnerOption(Option<T> option) throws IOException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        protected <T> T setInnerOption(Option<T> option, T value) throws IllegalArgumentException, IOException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        protected UpdatetableOptionHandler getUpdatableOptions() {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
 

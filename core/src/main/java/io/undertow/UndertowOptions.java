@@ -20,6 +20,10 @@ package io.undertow;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.xnio.Option;
 import org.xnio.Options;
 import org.xnio.channels.ReadTimeoutException;
@@ -582,4 +586,68 @@ public class UndertowOptions {
     private UndertowOptions() {
 
     }
+
+    private static final Set<String> SUPPORTED_UNDERTOW;
+    static {
+        HashSet<String> sups = new HashSet<String>();
+        sups.add(MAX_HEADER_SIZE.getName());
+        sups.add(MAX_ENTITY_SIZE.getName());
+        sups.add(MULTIPART_MAX_ENTITY_SIZE.getName());
+        sups.add(BUFFER_PIPELINED_DATA.getName());
+        sups.add(IDLE_TIMEOUT.getName());
+        sups.add(REQUEST_PARSE_TIMEOUT.getName());
+        sups.add(NO_REQUEST_TIMEOUT.getName());
+        sups.add(MAX_PARAMETERS.getName());
+        sups.add(MAX_HEADERS.getName());
+        sups.add(MAX_COOKIES.getName());
+        sups.add(ALLOW_ENCODED_SLASH.getName());
+        sups.add(DECODE_SLASH.getName());
+        sups.add(DECODE_URL.getName());
+        sups.add(URL_CHARSET.getName());
+        sups.add(ALWAYS_SET_KEEP_ALIVE.getName());
+        sups.add(ALWAYS_SET_DATE.getName());
+        sups.add(MAX_BUFFERED_REQUEST_SIZE.getName());
+        sups.add(RECORD_REQUEST_START_TIME.getName());
+        sups.add(ALLOW_EQUALS_IN_COOKIE_VALUE.getName());
+        sups.add(ENABLE_RFC6265_COOKIE_VALIDATION.getName());
+        sups.add(ENABLE_SPDY.getName());
+        sups.add(ENABLE_HTTP2.getName());
+        sups.add(ENABLE_STATISTICS.getName());
+        sups.add(ALLOW_UNKNOWN_PROTOCOLS.getName());
+        sups.add(HTTP2_SETTINGS_HEADER_TABLE_SIZE.getName());
+        sups.add(HTTP2_SETTINGS_ENABLE_PUSH.getName());
+        sups.add(HTTP2_SETTINGS_MAX_CONCURRENT_STREAMS.getName());
+        sups.add(HTTP2_SETTINGS_INITIAL_WINDOW_SIZE.getName());
+        sups.add(HTTP2_SETTINGS_MAX_FRAME_SIZE.getName());
+        sups.add(HTTP2_SETTINGS_MAX_HEADER_LIST_SIZE.getName());
+        sups.add(HTTP2_PADDING_SIZE.getName());
+        sups.add(HTTP2_HUFFMAN_CACHE_SIZE.getName());
+        sups.add(MAX_CONCURRENT_REQUESTS_PER_CONNECTION.getName());
+        sups.add(MAX_QUEUED_READ_BUFFERS.getName());
+        sups.add(MAX_AJP_PACKET_SIZE.getName());
+        sups.add(REQUIRE_HOST_HTTP11.getName());
+        sups.add(MAX_CACHED_HEADER_SIZE.getName());
+        sups.add(HTTP_HEADERS_CACHE_SIZE.getName());
+        sups.add(SSL_USER_CIPHER_SUITES_ORDER.getName());
+        sups.add(SSL_SNI_HOSTNAME.getName());
+        sups.add(ALLOW_UNESCAPED_CHARACTERS_IN_URL.getName());
+        sups.add(SHUTDOWN_TIMEOUT.getName());
+        sups.add(ENDPOINT_IDENTIFICATION_ALGORITHM.getName());
+        sups.add(QUEUED_FRAMES_HIGH_WATER_MARK.getName());
+        sups.add(QUEUED_FRAMES_LOW_WATER_MARK.getName());
+        sups.add(AJP_ALLOWED_REQUEST_ATTRIBUTES_PATTERN.getName());
+        sups.add(TRACK_ACTIVE_REQUESTS.getName());
+        sups.add(RST_FRAMES_TIME_WINDOW.getName());
+        sups.add(MAX_RST_FRAMES_PER_WINDOW.getName());
+        sups.add(MEMORY_STORAGE_THRESHOLD.getName());
+        sups.add(WEB_SOCKETS_READ_TIMEOUT.getName());
+        sups.add(WEB_SOCKETS_WRITE_TIMEOUT.getName());
+        sups.add(ALLOW_ID_LESS_MATRIX_PARAMETERS.getName());
+        SUPPORTED_UNDERTOW = Collections.unmodifiableSet(sups);
+    }
+
+    public static boolean supportsOption(Option<?> option) {
+        return option == null ? false : SUPPORTED_UNDERTOW.contains(option.getName());
+    }
+
 }

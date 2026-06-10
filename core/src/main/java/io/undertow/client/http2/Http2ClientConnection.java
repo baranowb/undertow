@@ -313,17 +313,17 @@ public class Http2ClientConnection implements ClientConnection {
 
     @Override
     public boolean supportsOption(Option<?> option) {
-        return false;
+        return this.http2Channel.supportsOption(option);
     }
 
     @Override
     public <T> T getOption(Option<T> option) throws IOException {
-        return null;
+        return this.http2Channel.getOption(option);
     }
 
     @Override
     public <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException {
-        return null;
+        return this.http2Channel.setOption(option, value);
     }
 
     @Override

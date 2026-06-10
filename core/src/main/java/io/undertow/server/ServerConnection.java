@@ -18,11 +18,14 @@
 
 package io.undertow.server;
 
+import io.undertow.UndertowOptions;
 import io.undertow.connector.ByteBufferPool;
 import io.undertow.util.AbstractAttachable;
 
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
+import io.undertow.util.UpdatetableOptionHandler;
+
 import org.xnio.Option;
 import org.xnio.OptionMap;
 import org.xnio.Pool;
@@ -120,13 +123,41 @@ public abstract class ServerConnection extends AbstractAttachable implements Con
      */
     public abstract boolean isOpen();
 
-    public abstract boolean supportsOption(Option<?> option);
+    public boolean supportsOption(Option<?> option) {
+        if (UndertowOptions.supportsOption(option)) {
+            return true;
+        } else {
+            return innerSupportsOption(option);
+        }
+    }
 
-    public abstract <T> T getOption(Option<T> option) throws IOException;
+    public <T> T getOption(Option<T> option) throws IOException{
+        final UpdatetableOptionHandler options = getUpdatableOptions();
+        if (options.supportsOption(option)) {
+            return getUndertowOptions().get(option);
+        } else {
+            return getInnerOption(option);
+        }
+    }
 
-    public abstract <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException;
+    public <T> T setOption(Option<T> option, T value) throws IllegalArgumentException, IOException{
+        final UpdatetableOptionHandler options = getUpdatableOptions();
+        if (options.supportsOption(option)) {
+            return options.setOption(option, value);
+        } else {
+            return setInnerOption(option, value);
+        }
+    }
+
 
     public abstract void close() throws IOException;
+
+    //Methods to replace above in impl to defer to channel/xnio.Configurable.
+    protected abstract boolean innerSupportsOption(Option<?> option);
+
+    protected abstract <T> T getInnerOption(Option<T> option) throws IOException;
+
+    protected abstract <T> T setInnerOption(Option<T> option, T value) throws IllegalArgumentException, IOException;
 
     /**
      *
@@ -162,7 +193,11 @@ public abstract class ServerConnection extends AbstractAttachable implements Con
 
     public abstract <A extends SocketAddress> A getLocalAddress(Class<A> type);
 
-    public abstract OptionMap getUndertowOptions();
+    public OptionMap getUndertowOptions() {
+        return getUpdatableOptions().getOptionsMap();
+    }
+
+    protected abstract UpdatetableOptionHandler getUpdatableOptions();
 
     public abstract int getBufferSize();
 

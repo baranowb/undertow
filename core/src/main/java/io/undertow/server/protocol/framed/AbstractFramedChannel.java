@@ -63,6 +63,7 @@ import io.undertow.conduits.IdleTimeoutConduit;
 import io.undertow.connector.ByteBufferPool;
 import io.undertow.connector.PooledByteBuffer;
 import io.undertow.util.ReferenceCountedPooled;
+import io.undertow.util.UpdatetableOptionHandler;
 
 /**
  * A {@link org.xnio.channels.ConnectedChannel} which can be used to send and receive Frames.
@@ -147,8 +148,8 @@ public abstract class AbstractFramedChannel<C extends AbstractFramedChannel<C, R
             }
         }
     };
-    private final OptionMap settings;
-
+    //private final OptionMap settings;
+    private final UpdatetableOptionHandler settings;
     /**
      * If this is true then the flush() method must be called to queue writes. This is provided to support batching
      */
@@ -206,7 +207,7 @@ public abstract class AbstractFramedChannel<C extends AbstractFramedChannel<C, R
     protected AbstractFramedChannel(final StreamConnection connectedStreamChannel, ByteBufferPool bufferPool, FramePriority<C, R, S> framePriority, final PooledByteBuffer readData, OptionMap settings) {
         this.framePriority = framePriority;
         this.maxQueuedBuffers = settings.get(UndertowOptions.MAX_QUEUED_READ_BUFFERS, UndertowOptions.DEFAULT_MAX_QUEUED_READ_BUFFERS);
-        this.settings = settings;
+        this.settings = new UpdatetableOptionHandler(settings);
         if (readData != null) {
             if(readData.getBuffer().hasRemaining()) {
                 this.readData = new ReferenceCountedPooled(readData, 1);
@@ -303,16 +304,25 @@ public abstract class AbstractFramedChannel<C extends AbstractFramedChannel<C, R
 
     @Override
     public boolean supportsOption(Option<?> option) {
+        if(this.settings.supportsOption(option)) {
+            return true;
+        }
         return channel.supportsOption(option);
     }
 
     @Override
     public <T> T getOption(Option<T> option) throws IOException {
+        if(this.settings.supportsOption(option)) {
+            return this.settings.getOption(option);
+        }
         return channel.getOption(option);
     }
 
     @Override
     public <T> T setOption(Option<T> option, T value) throws IOException {
+        if(this.settings.supportsOption(option)) {
+            return this.settings.setOption(option, value);
+        }
         return channel.setOption(option, value);
     }
 
@@ -1202,7 +1212,7 @@ public abstract class AbstractFramedChannel<C extends AbstractFramedChannel<C, R
     }
 
     protected OptionMap getSettings() {
-        return settings;
+        return settings.getOptionsMap();
     }
 
     private class UpdateResumeState implements Runnable {

@@ -26,6 +26,8 @@ import org.xnio.Option;
 import org.xnio.OptionMap;
 import io.undertow.connector.ByteBufferPool;
 import io.undertow.connector.PooledByteBuffer;
+import io.undertow.util.UpdatetableOptionHandler;
+
 import org.xnio.Pool;
 import org.xnio.StreamConnection;
 import org.xnio.XnioIoThread;
@@ -46,7 +48,8 @@ public abstract class AbstractServerConnection  extends ServerConnection {
     protected final CloseSetter closeSetter;
     protected final ByteBufferPool bufferPool;
     protected final HttpHandler rootHandler;
-    protected final OptionMap undertowOptions;
+    //protected final OptionMap undertowOptions;
+    protected final UpdatetableOptionHandler undertowOptions;
     protected final StreamSourceConduit originalSourceConduit;
     protected final StreamSinkConduit originalSinkConduit;
     protected final List<CloseListener> closeListeners = new LinkedList<>();
@@ -66,7 +69,7 @@ public abstract class AbstractServerConnection  extends ServerConnection {
         this.channel = channel;
         this.bufferPool = bufferPool;
         this.rootHandler = rootHandler;
-        this.undertowOptions = undertowOptions;
+        this.undertowOptions = new UpdatetableOptionHandler(undertowOptions);
         this.bufferSize = bufferSize;
         closeSetter = new CloseSetter();
         if (channel != null) {
@@ -140,17 +143,17 @@ public abstract class AbstractServerConnection  extends ServerConnection {
     }
 
     @Override
-    public boolean supportsOption(final Option<?> option) {
+    public boolean innerSupportsOption(final Option<?> option) {
         return channel.supportsOption(option);
     }
 
     @Override
-    public <T> T getOption(final Option<T> option) throws IOException {
+    public <T> T getInnerOption(final Option<T> option) throws IOException {
         return channel.getOption(option);
     }
 
     @Override
-    public <T> T setOption(final Option<T> option, final T value) throws IllegalArgumentException, IOException {
+    public <T> T setInnerOption(final Option<T> option, final T value) throws IllegalArgumentException, IOException {
         return channel.setOption(option, value);
     }
 
@@ -180,7 +183,7 @@ public abstract class AbstractServerConnection  extends ServerConnection {
     }
 
     @Override
-    public OptionMap getUndertowOptions() {
+    protected UpdatetableOptionHandler getUpdatableOptions() {
         return undertowOptions;
     }
 
